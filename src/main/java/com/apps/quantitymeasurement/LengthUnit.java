@@ -15,5 +15,14 @@ package com.apps.quantitymeasurement;
 	 public double getConversionFactor() {
 		 return conversionFactor;
 	 }
+	// Convert given value to base unit 
+			public double convertToBaseUnit(double value) {
+				return value * conversionFactor;
+			}
 
+			// Convert from base unit to current unit
+			public double convertFromBaseUnit(double baseValue) {
+				return baseValue / conversionFactor;
+			}
+		
 }
