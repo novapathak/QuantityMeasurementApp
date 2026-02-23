@@ -7,41 +7,27 @@ import java.util.*;
  */
 public class QuantityMeasurementApp 
 {
-	public static boolean compareFeet(double value1, double value2) {
-		Feet f1 = new Feet(value1);
-		Feet f2 = new Feet(value2);
-		return f1.equals(f2);
-	}
-	public static boolean compareInches(double value1, double value2) {
-		Feet i1 = new Feet(value1);
-		Feet i2 = new Feet(value2);
-		return i1.equals(i2);
-	}
 	
-	
-    public static void main( String[] args )
-    {
-    	Scanner sc = new Scanner(System.in);
-    	try {
-    	System.out.println("Enter first value in feet: ");
-    	double feet1 = Double.parseDouble(sc.nextLine());
-    	System.out.println("Enter second value in feet: ");
-    	double feet2 = Double.parseDouble(sc.nextLine());
-    	
-    	System.out.println("Equal ? ( " + compareInches(feet1,feet2)+" )");
-    	
-    	System.out.println("Enter first value in Inches: ");
-    	double Inch1 = Double.parseDouble(sc.nextLine());
-    	System.out.println("Enter second value in Inches: ");
-    	double Inch2 = Double.parseDouble(sc.nextLine());
-    	
-    	System.out.println("Equal ? ( " + compareInches(Inch1, Inch2)+ " )");
-    	
-    	}
-    	catch (NumberFormatException e) {
-    		System.out.println("Invalid input! Please enter numeric values only");
-    	}
-    	
+	public static void main(String[]args) {
+		Scanner sc = new Scanner(System.in);
+		
+		
+		// Cross-unit comparison
+		Length l1 = new Length(1.0, LengthUnit.FEET);
+		Length l2 = new Length(12.0, LengthUnit.INCH);
+		
+		System.out.println("Input: "+ l1+ " and "+ l2 );
+		System.out.println("Output: Equal "+ l1.equals(l2));
+		
+		
+		// Same-unit comparison
+		Length l3 = new Length(1.0, LengthUnit.INCH);
+		Length l4 = new Length(12.0, LengthUnit.INCH);
+		
+		// Results of comparison
+        System.out.println("Input values: " + l3 + " and " + l4);
+        System.out.println("Output: Equal " + l3.equals(l4) );
+		
     sc.close();	
       
     }
