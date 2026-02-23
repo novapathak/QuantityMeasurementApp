@@ -5,15 +5,15 @@ package com.apps.quantitymeasurement;
 	 INCH(1.0 / 12.0), YARDS(36.0), CENTIMETERS(0.393701);
 
 	 
-	 private final double conversionFactorToFeet;
+	 private final double conversionFactor;
 	 
 	 
-	 LengthUnit(double conversionFactorToFeet){
-		 this.conversionFactorToFeet = conversionFactorToFeet;
+	 LengthUnit(double conversionFactor){
+		 this.conversionFactor = conversionFactor;
 	 }
 	 
-	 public double getConversionFactorToFeet() {
-		 return conversionFactorToFeet;
+	 public double getConversionFactor() {
+		 return conversionFactor;
 	 }
 
 }

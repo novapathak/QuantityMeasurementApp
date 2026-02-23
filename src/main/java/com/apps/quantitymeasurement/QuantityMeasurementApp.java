@@ -8,37 +8,37 @@ import java.util.*;
 public class QuantityMeasurementApp 
 {
 	
-	public static void demonstrateLengthComparison(double value1, LengthUnit unit1, double value2, LengthUnit unit2) {
-
-		Length l1 = new Length(value1, unit1);
-		Length l2 = new Length(value2, unit2);
-
-		boolean result = l1.equals(l2);
-
-		System.out.println("Length 1: " + l1);
-		System.out.println("Length 2: " + l2);
-		System.out.println("Are Both length equal? " + result);
+	public static boolean demonstrateLengthEquality(Length l1, Length l2) {
+		return l1.equals(l2);
 	}
-	public static void main(String[]args) {
-		Scanner sc = new Scanner(System.in);
-		
-		
-		// Feet and Inches
-				demonstrateLengthComparison(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH);
 
-				// Yards and Inches
-				demonstrateLengthComparison(1.0, LengthUnit.YARDS, 36.0, LengthUnit.INCH);
+	public static double demonstrateLengthConversion(double value, LengthUnit fromUnit, LengthUnit toUnit) {
+		return Length.convert(value, fromUnit, toUnit);
+	}
 
-				// Centimeters and Inches
-				demonstrateLengthComparison(100.0, LengthUnit.CENTIMETERS, 39.3701, LengthUnit.INCH);
+	public static Length demonstrateLengthConversion(Length length, LengthUnit toUnit) {
+		return length.convertTo(toUnit);
+	}
 
-				// Feet and Yards
-				demonstrateLengthComparison(3.0, LengthUnit.FEET, 1.0, LengthUnit.YARDS);
+	public static void main(String[] args) {
 
-				// Centimeters and Feet
-				demonstrateLengthComparison(30.48, LengthUnit.CENTIMETERS, 1.0, LengthUnit.FEET);
-		
-    sc.close();	
-      
-    }
+
+
+		Length feet = new Length(1.0, LengthUnit.FEET);
+		Length inches = new Length(12.0, LengthUnit.INCH);
+
+		Length result1 = feet.add(inches);
+		System.out.println("1 FEET + 12 INCHES = " + result1);
+
+		Length result2 = inches.add(feet);
+		System.out.println("12 INCHES + 1 FEET = " + result2);
+
+		Length yard = new Length(1.0, LengthUnit.YARDS);
+		Length result3 = yard.add(new Length(3.0, LengthUnit.FEET));
+		System.out.println("1 YARD + 3 FEET = " + result3);
+
+		Length cm = new Length(2.54, LengthUnit.CENTIMETERS);
+		Length result4 = cm.add(new Length(1.0, LengthUnit.INCH));
+		System.out.println("2.54 CM + 1 INCH = " + result4);
+	}
 }
