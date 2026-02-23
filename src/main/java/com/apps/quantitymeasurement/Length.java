@@ -6,6 +6,9 @@ public class Length {
 	private LengthUnit unit;
 	
 	public Length(double value, LengthUnit unit) {
+		if (unit == null)
+			throw new IllegalArgumentException("Unit cannot be null");
+
 		this.value = value;
 		this.unit = unit;
 	}
