@@ -1,7 +1,7 @@
 # QuantityMeasurementApp
-#Overview
+# Overview
 
-# Quantity Measurement: UC1 Summary
+ Quantity Measurement: UC1 Summary
 
 ## ✅ **Object Equality**
 - Overrode `equals()` for value-based comparison (1.0 ft == 1.0 ft)
