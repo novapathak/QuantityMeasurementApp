@@ -1,6 +1,17 @@
 package com.apps.quantitymeasurement;
 
-public class QuantityMeasurementApp {
+import com.apps.quantitymeasurement.controller.QuantityMeasurementController;
+import com.apps.quantitymeasurement.core.IMeasurable;
+import com.apps.quantitymeasurement.core.Quantity;
+import com.apps.quantitymeasurement.model.QuantityDTO;
+import com.apps.quantitymeasurement.repository.QuantityMeasurementCacheRepository;
+import com.apps.quantitymeasurement.service.QuantityMeasurementServiceImpl;
+import com.apps.quantitymeasurement.units.LengthUnit;
+import com.apps.quantitymeasurement.units.TemperatureUnit;
+import com.apps.quantitymeasurement.units.VolumeUnit;
+import com.apps.quantitymeasurement.units.WeightUnit;
+
+/* public class QuantityMeasurementApp {
 
 	public static <U extends IMeasurable> boolean demonstrateEquality(Quantity<U> q1, Quantity<U> q2) {
 		return q1.equals(q2);
@@ -92,4 +103,59 @@ public class QuantityMeasurementApp {
 		}
 
 	}
+}*/
+public class QuantityMeasurementApp {
+
+    public static void main(String[] args) {
+
+        // Repository
+        QuantityMeasurementCacheRepository repository =
+                new QuantityMeasurementCacheRepository();
+
+        // Service
+        QuantityMeasurementServiceImpl service =
+                new QuantityMeasurementServiceImpl(repository);
+
+        // Controller
+        QuantityMeasurementController controller =
+                new QuantityMeasurementController(service);
+
+        // Example 1: Comparison
+        QuantityDTO q1 =
+                new QuantityDTO(1, QuantityDTO.LengthUnit.FEET);
+
+        QuantityDTO q2 =
+                new QuantityDTO(12, QuantityDTO.LengthUnit.INCH);
+
+        System.out.println("1 FEET equals 12 INCHES: "
+                + controller.compare(q1, q2));
+
+        // Example 2: Conversion
+        QuantityDTO converted =
+                controller.convert(q1, QuantityDTO.LengthUnit.INCH);
+
+        System.out.println("1 FEET in INCHES: "
+                + converted.value);
+
+        // Example 3: Addition
+        QuantityDTO added =
+                controller.add(q1, q2);
+
+        System.out.println("Addition result: "
+                + added.value + " " + added.unit.getUnitName());
+
+        // Example 4: Subtraction
+        QuantityDTO subtracted =
+                controller.subtract(q1, q2);
+
+        System.out.println("Subtraction result: "
+                + subtracted.value + " " + subtracted.unit.getUnitName());
+
+        // Example 5: Division
+        double result =
+                controller.divide(q1, new QuantityDTO(2,
+                        QuantityDTO.LengthUnit.FEET));
+
+        System.out.println("Division result: " + result);
+    }
 }
