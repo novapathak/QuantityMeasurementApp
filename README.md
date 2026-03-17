@@ -40,235 +40,234 @@
 ---
 # Quantity Measurement Application
 
-A Java-based project that demonstrates how different types of measurements can be compared, converted, and calculated using core object-oriented programming principles.
+A Java-based project that demonstrates how different types of measurements can be **compared**, **converted**, and **calculated** using core **Object-Oriented Programming (OOP)** principles.
 
 ---
 
 ## UC1: Equality Check for Feet
 
 ### Overview  
-This use case checks whether two values measured in feet are equal. It safely handles null values, type mismatches, and floating-point precision issues.
+This use case checks whether two values measured in feet are equal. It safely handles **null values**, **type mismatches**, and **floating-point precision issues**.
 
 ### Flow  
-- Take two values in feet as input  
-- Validate that both inputs are numeric  
-- Compare them and return true or false  
+- Take two values in **feet** as input  
+- Validate that both inputs are **numeric**  
+- Compare them and return `true` or `false`  
 
 ### Concepts Used  
-- equals() implemented using Double.compare() instead of ==  
-- private final fields for immutability  
-- null and type validation  
+- `equals()` implemented using **Double.compare()** instead of `==`  
+- Use of **private final fields** for immutability  
+- Proper **null and type validation**  
 
 ---
 
 ## UC2: Feet and Inches Equality
 
 ### Overview  
-This extends the previous use case by supporting both feet and inches using separate classes. Static helper methods reduce dependency on the main method.
+Extends the previous use case by supporting both **feet** and **inches** using separate classes. Introduces **static helper methods** to reduce dependency on the main method.
 
 ### Flow  
-- A static method compares two feet values  
-- Another static method compares two inches values  
-- Returns true or false for each comparison  
+- Static method compares two **feet values**  
+- Static method compares two **inch values**  
+- Returns `true` or `false`  
 
 ### Concepts Used  
-- Separate Inches class similar to Feet  
-- Static methods for comparison  
-- Code duplication (handled in UC3)  
+- Separate `Inches` class similar to `Feet`  
+- Use of **static methods**  
+- Presence of **code duplication** (resolved in UC3)  
 
 ---
 
 ## UC3: Generic Length Class
 
 ### Overview  
-This refactors the design by introducing a single QuantityLength class along with a LengthUnit enum. It enables comparison across different units.
+Refactors the design into a single **QuantityLength class** using a **LengthUnit enum**, enabling comparison across different units.
 
 ### Flow  
-- Input value with unit type  
-- Convert values into a base unit (feet)  
+- Input **value + unit**  
+- Convert values into a **base unit (feet)**  
 - Compare the converted values  
 
 ### Concepts Used  
-- Enum for conversion factors  
-- DRY principle  
-- Base unit normalization  
+- **Enum-based conversion factors**  
+- **DRY principle** (no duplication)  
+- **Base unit normalization**  
 
 ---
 
 ## UC4: Support for Additional Units
 
 ### Overview  
-Adds support for yards and centimeters without modifying the core logic.
+Adds support for **yards** and **centimeters** without modifying core logic.
 
 ### Flow  
-- Accept value with unit type  
-- Convert the value to feet  
+- Accept value with **unit type**  
+- Convert to **feet (base unit)**  
 - Perform comparison  
 
 ### Details  
-- 1 yard = 3 feet  
-- 1 centimeter ≈ 0.0328 feet  
+- `1 yard = 3 feet`  
+- `1 centimeter ≈ 0.0328 feet`  
 
 ---
 
 ## UC5: Unit Conversion
 
 ### Overview  
-Introduces functionality to convert values between different units.
+Introduces conversion between different units using a **standard conversion formula**.
 
 ### Flow  
-- Validate value and units  
-- Convert value to base unit  
-- Convert base unit to target unit  
-- Return the result  
+- Validate **value and units**  
+- Convert to **base unit**  
+- Convert to **target unit**  
+- Return result  
 
 ### Concepts Used  
-- Method overloading  
-- Helper methods for encapsulation  
-- toString() for readability  
+- **Method overloading**  
+- **Encapsulation using helper methods**  
+- `toString()` for better readability  
 
 ### Formula  
-result = value × (source.factor / target.factor)
+`result = value × (source.factor / target.factor)`
 
 ---
 
 ## UC6: Addition of Lengths
 
 ### Overview  
-Allows addition of two measurements, even if they belong to different units. The result is returned in the unit of the first operand.
+Allows addition of two measurements, even with different units. Result is returned in the **unit of the first operand**.
 
 ### Flow  
-- Validate both inputs  
-- Convert values to base unit  
-- Perform addition  
-- Convert result back to first unit  
+- Validate inputs  
+- Convert both to **base unit**  
+- Perform **addition**  
+- Convert result back  
 
 ### Concepts Used  
-- Immutability (returns new object)  
-- Commutative property  
-- Overloaded methods  
+- **Immutability** (returns new object)  
+- **Commutative property** (`A + B = B + A`)  
+- **Method overloading**  
 
 ---
 
 ## UC7: Addition with Target Unit
 
 ### Overview  
-Allows specifying a custom unit for the result.
+Allows specifying a **custom target unit** for the result.
 
 ### Flow  
-- Validate inputs and target unit  
-- Convert values to base unit  
-- Add them  
-- Convert result to specified unit  
+- Validate operands and **target unit**  
+- Convert to **base unit**  
+- Add values  
+- Convert result to target unit  
 
 ### Concepts Used  
-- Method overloading  
-- Reusable internal logic  
-- Flexible unit handling  
+- **Flexible API design**  
+- **Reusable internal logic**  
+- Avoids **code duplication**  
 
 ---
 
 ## UC8: Standalone LengthUnit
 
 ### Overview  
-Moves LengthUnit into a separate class and assigns conversion responsibility to it.
+Extracts `LengthUnit` into a standalone enum and assigns it the **conversion responsibility**.
 
 ### Flow  
-- LengthUnit performs conversions  
-- QuantityLength delegates conversion logic  
+- `LengthUnit` handles conversions  
+- `QuantityLength` delegates logic  
 
 ### Concepts Used  
-- Single Responsibility Principle  
-- Scalable design  
-- Clean separation of concerns  
+- **Single Responsibility Principle (SRP)**  
+- **Clean architecture**  
+- Improved **scalability**  
 
 ---
 
 ## UC9: Weight Measurement
 
 ### Overview  
-Introduces weight measurement using kilogram, gram, and pound units.
+Introduces weight measurement using **kilogram**, **gram**, and **pound**.
 
 ### Details  
-- Base unit: kilogram  
-- 1 gram = 0.001 kilogram  
-- 1 pound = 0.453592 kilogram  
+- Base unit: **kilogram**  
+- `1 gram = 0.001 kilogram`  
+- `1 pound = 0.453592 kilogram`  
 
 ### Concepts Used  
-- WeightUnit enum  
-- Category type safety  
-- equals() and hashCode() consistency  
+- `WeightUnit` enum  
+- **Category-level type safety**  
+- Consistent `equals()` and `hashCode()`  
 
 ---
 
 ## UC10: Generic Quantity Class
 
 ### Overview  
-Combines all measurement types into a single generic class using a shared interface.
+Unifies all measurement types into a single **generic class** using a common interface.
 
 ### Architecture  
-- IMeasurable defines conversion behavior  
-- Unit enums implement the interface  
-- Quantity class handles operations  
-- Application class demonstrates usage  
+- `IMeasurable` → defines conversion behavior  
+- Unit enums → implement interface  
+- `Quantity<U>` → handles operations  
 
 ### Concepts Used  
-- Generics (<U extends IMeasurable>)  
-- Code reuse  
-- Easy extensibility  
+- **Generics (<U extends IMeasurable>)**  
+- High **code reusability**  
+- Easy **extensibility**  
 
 ---
 
 ## UC11: Volume Measurement
 
 ### Overview  
-Adds volume measurement without modifying existing logic.
+Adds volume measurement without changing existing code.
 
 ### Details  
-- Base unit: litre  
-- 1 millilitre = 0.001 litre  
-- 1 gallon = 3.78541 litres  
+- Base unit: **litre**  
+- `1 millilitre = 0.001 litre`  
+- `1 gallon = 3.78541 litres`  
 
 ### Concepts Used  
-- Plug-and-play design  
-- No changes to core logic  
-- Category isolation  
+- **Plug-and-play architecture**  
+- No change in **core logic**  
+- Strong **category isolation**  
 
 ---
 
 ## UC12: Subtraction and Division
 
 ### Overview  
-Adds subtraction and division operations.
+Adds subtraction and division operations with proper validation.
 
 ### Operations  
-- Subtraction returns a new quantity  
-- Division returns a numeric value  
+- `subtract()` → returns **Quantity<U>**  
+- `divide()` → returns **double**  
 
 ### Concepts Used  
-- Non-commutative operations  
-- Division by zero handling  
-- Same-category validation  
+- **Non-commutative operations**  
+- **Division by zero handling**  
+- **Same-category enforcement**  
 
 ---
 
 ## UC13: Centralized Arithmetic Logic
 
 ### Overview  
-Refactors arithmetic operations to remove duplicate logic.
+Refactors arithmetic operations to remove duplication and centralize logic.
 
 ### Structure  
-- ArithmeticOperation enum defines operations  
-- Centralized validation method  
-- Base unit computation handled in one place  
+- `ArithmeticOperation` enum → defines operations  
+- Centralized **validation method**  
+- Shared **base unit computation**  
 
 ### Concepts Used  
-- DRY principle  
-- Consistent validation  
-- Improved maintainability  
+- **DRY principle**  
+- **Consistent validation**  
+- Better **maintainability**  
 
 ---
 
 ## Summary
 
-This project evolves from simple equality checks to a scalable measurement system. It demonstrates object-oriented design, clean architecture, reusability, and strong type safety across multiple measurement categories.
+This project evolves from basic equality checks to a **fully scalable measurement system**. It demonstrates strong use of **OOP concepts**, **clean architecture**, **reusability**, and **type safety** across multiple measurement categories.
