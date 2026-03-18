@@ -1,15 +1,24 @@
 package com.apps.quantitymeasurement;
 
+import java.sql.*;
+import java.sql.Connection;
+import java.sql.Statement;
+import org.h2.tools.Server;
 import com.apps.quantitymeasurement.controller.QuantityMeasurementController;
 import com.apps.quantitymeasurement.core.IMeasurable;
 import com.apps.quantitymeasurement.core.Quantity;
 import com.apps.quantitymeasurement.model.QuantityDTO;
-import com.apps.quantitymeasurement.repository.QuantityMeasurementCacheRepository;
+import com.apps.quantitymeasurement.repository.QuantityMeasurementDatabaseRepository;
+import com.apps.quantitymeasurement.repository.IQuantityMeasurementRepository;
+import com.apps.quantitymeasurement.service.IQuantityMeasurementService;
 import com.apps.quantitymeasurement.service.QuantityMeasurementServiceImpl;
 import com.apps.quantitymeasurement.units.LengthUnit;
 import com.apps.quantitymeasurement.units.TemperatureUnit;
 import com.apps.quantitymeasurement.units.VolumeUnit;
 import com.apps.quantitymeasurement.units.WeightUnit;
+import com.apps.quantitymeasurement.util.ConnectionPool;
+
+
 
 /* public class QuantityMeasurementApp {
 
@@ -109,8 +118,8 @@ public class QuantityMeasurementApp {
     public static void main(String[] args) {
 
         // Repository
-        QuantityMeasurementCacheRepository repository =
-                new QuantityMeasurementCacheRepository();
+       /* QuantityMeasurementDatabaseRepository repository =
+                new QuantityMeasurementDatabaseRepository();
 
         // Service
         QuantityMeasurementServiceImpl service =
@@ -157,5 +166,88 @@ public class QuantityMeasurementApp {
                         QuantityDTO.LengthUnit.FEET));
 
         System.out.println("Division result: " + result);
+        */
+    	initDatabase();
+    	IQuantityMeasurementRepository repository =
+    	        new QuantityMeasurementDatabaseRepository();  // Step 8
+
+        IQuantityMeasurementService service =
+                new QuantityMeasurementServiceImpl(repository);
+
+        QuantityMeasurementController controller =
+                new QuantityMeasurementController(service);
+        
+        QuantityDTO q1 =
+                new QuantityDTO(1, QuantityDTO.LengthUnit.FEET);
+
+        QuantityDTO q2 =
+                new QuantityDTO(12, QuantityDTO.LengthUnit.INCH);
+
+        System.out.println("1 FEET equals 12 INCHES: "
+                + controller.compare(q1, q2));
+
+        // Example 2: Conversion
+        QuantityDTO converted =
+                controller.convert(q1, QuantityDTO.LengthUnit.INCH);
+
+        System.out.println("1 FEET in INCHES: "
+                + converted.value);
+
+        // Example 3: Addition
+        QuantityDTO added =
+                controller.add(q1, q2);
+
+        System.out.println("Addition result: "
+                + added.value + " " + added.unit.getUnitName());
+
+        // Example 4: Subtraction
+        QuantityDTO subtracted =
+                controller.subtract(q1, q2);
+
+        System.out.println("Subtraction result: "
+                + subtracted.value + " " + subtracted.unit.getUnitName());
+
+        // Example 5: Division
+        double result =
+                controller.divide(q1, new QuantityDTO(2,
+                        QuantityDTO.LengthUnit.FEET));
+
+        System.out.println("Division result: " + result);
+        
+        
+        controller.add(
+        	    new QuantityDTO(5, QuantityDTO.LengthUnit.CENTIMETERS),
+        	    new QuantityDTO(2, QuantityDTO.LengthUnit.CENTIMETERS)
+        	);
+
+        	controller.add(
+        	    new QuantityDTO(10, QuantityDTO.LengthUnit.FEET),
+        	    new QuantityDTO(5, QuantityDTO.LengthUnit.FEET)
+        	);
+
+        	System.out.println("Total records: " + repository.getTotalCount());
     }
+    private static void initDatabase() {
+        try (Connection conn = ConnectionPool.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+        	Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
+        	
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS quantity_measurement (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    quantity_value DOUBLE,
+                    unit VARCHAR(50),
+                    measurement_type VARCHAR(50),
+                    operation VARCHAR(50),
+                    result DOUBLE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """);
+
+        } catch (Exception e) {
+            throw new RuntimeException("DB Init failed", e);
+        }
+    }
+    
 }
