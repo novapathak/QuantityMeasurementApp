@@ -2,139 +2,173 @@ package com.apps.quantitymeasurement.service;
 
 import com.apps.quantitymeasurement.core.IMeasurable;
 import com.apps.quantitymeasurement.core.Quantity;
-import com.apps.quantitymeasurement.model.QuantityDTO;
-import com.apps.quantitymeasurement.model.QuantityMeasurementEntity;
-import com.apps.quantitymeasurement.repository.IQuantityMeasurementRepository;
-import com.apps.quantitymeasurement.units.LengthUnit;
-import com.apps.quantitymeasurement.units.TemperatureUnit;
-import com.apps.quantitymeasurement.units.VolumeUnit;
-import com.apps.quantitymeasurement.units.WeightUnit;
+import com.apps.quantitymeasurement.model.*;
+import com.apps.quantitymeasurement.repository.QuantityMeasurementRepository;
+import com.apps.quantitymeasurement.units.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
 
-    private final IQuantityMeasurementRepository repository;
+    @Autowired
+    private QuantityMeasurementRepository repository;
 
-    public QuantityMeasurementServiceImpl(IQuantityMeasurementRepository repository) {
+    private Quantity<IMeasurable> toQuantity(QuantityDTO dto) {
+        return new Quantity<>(dto.getValue(), getCoreUnit(dto.getUnit()));
+    }
+    
+    public QuantityMeasurementServiceImpl(QuantityMeasurementRepository repository) {
         this.repository = repository;
     }
 
-    // DTO -> Core
-    private Quantity<IMeasurable> toQuantity(QuantityDTO dto) {
-        IMeasurable unit = getCoreUnit(dto.unit);
-        return new Quantity<>(dto.value, unit);
-    }
-
-    // DTO Unit -> Core Unit
-    private IMeasurable getCoreUnit(QuantityDTO.IMeasurableUnit dtoUnit) {
-
-        String name = dtoUnit.getUnitName();
-
+    private IMeasurable getCoreUnit(String unitName) {
         for (LengthUnit u : LengthUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
+            if (u.getUnitName().equalsIgnoreCase(unitName)) return u;
 
         for (WeightUnit u : WeightUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
+            if (u.getUnitName().equalsIgnoreCase(unitName)) return u;
 
         for (VolumeUnit u : VolumeUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
+            if (u.getUnitName().equalsIgnoreCase(unitName)) return u;
 
         for (TemperatureUnit u : TemperatureUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
+            if (u.getUnitName().equalsIgnoreCase(unitName)) return u;
 
-        throw new IllegalArgumentException("Invalid unit: " + name);
+        throw new IllegalArgumentException("Invalid unit: " + unitName);
     }
 
-    // COMMON METHOD TO SAVE DATA
-    private void saveToDatabase(double value, String unit, String type, String operation, double result) {
-        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
-        entity.setValue(value);
-        entity.setUnit(unit);
-        entity.setType(type);
-        entity.setOperation(operation);
-        entity.setResult(result);
-
+    private QuantityMeasurementDTO saveEntity(QuantityMeasurementEntity entity) {
         repository.save(entity);
+        return QuantityMeasurementDTO.fromEntity(entity);
     }
 
     @Override
-    public boolean compare(QuantityDTO q1, QuantityDTO q2) {
-
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
-
-        boolean result = quantity1.equals(quantity2);
-
-        //  SAVE
-        saveToDatabase(q1.value, q1.unit.getUnitName(), "COMPARE", "COMPARE", result ? 1 : 0);
-
-        return result;
+    public QuantityMeasurementDTO add(QuantityDTO q1, QuantityDTO q2) {
+        QuantityMeasurementEntity e = new QuantityMeasurementEntity();
+        try {
+            double result = toQuantity(q1).add(toQuantity(q2)).getValue();
+            e.setThisValue(q1.getValue());
+            e.setThisUnit(q1.getUnit());
+            e.setThisMeasurementType(q1.getMeasurementType());
+            e.setThatValue(q2.getValue());
+            e.setThatUnit(q2.getUnit());
+            e.setThatMeasurementType(q2.getMeasurementType());
+            e.setOperation("ADD");
+            e.setResultValue(result);
+            e.setResultUnit(q1.getUnit());
+            e.setResultMeasurementType(q1.getMeasurementType());
+            e.setError(false);
+        } catch (Exception ex) {
+            e.setError(true);
+            e.setErrorMessage(ex.getMessage());
+        }
+        return saveEntity(e);
     }
 
     @Override
-    public QuantityDTO convert(QuantityDTO quantityDTO, QuantityDTO.IMeasurableUnit targetUnit) {
-
-        Quantity<IMeasurable> quantity = toQuantity(quantityDTO);
-        IMeasurable coreTargetUnit = getCoreUnit(targetUnit);
-
-        Quantity<IMeasurable> result = quantity.convertTo(coreTargetUnit);
-
-        //  SAVE
-        saveToDatabase(quantityDTO.value, quantityDTO.unit.getUnitName(), "CONVERT", "CONVERT", result.getValue());
-
-        return new QuantityDTO(result.getValue(), targetUnit);
+    public QuantityMeasurementDTO subtract(QuantityDTO q1, QuantityDTO q2) {
+        QuantityMeasurementEntity e = new QuantityMeasurementEntity();
+        try {
+            double result = toQuantity(q1).subtract(toQuantity(q2)).getValue();
+            e.setThisValue(q1.getValue());
+            e.setThisUnit(q1.getUnit());
+            e.setThisMeasurementType(q1.getMeasurementType());
+            e.setThatValue(q2.getValue());
+            e.setThatUnit(q2.getUnit());
+            e.setThatMeasurementType(q2.getMeasurementType());
+            e.setOperation("SUBTRACT");
+            e.setResultValue(result);
+            e.setResultUnit(q1.getUnit());
+            e.setResultMeasurementType(q1.getMeasurementType());
+            e.setError(false);
+        } catch (Exception ex) {
+            e.setError(true);
+            e.setErrorMessage(ex.getMessage());
+        }
+        return saveEntity(e);
     }
 
     @Override
-    public QuantityDTO add(QuantityDTO q1, QuantityDTO q2) {
-
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
-
-        Quantity<IMeasurable> result = quantity1.add(quantity2);
-
-        // 🔥 CREATE ENTITY
-        QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
-        entity.setValue(q1.value);
-        entity.setUnit(q1.unit.getUnitName());
-        entity.setType(q1.unit.getMeasurementType());
-        entity.setOperation("ADD");
-        entity.setResult(result.getValue());
-
-        // 🔥 SAVE TO DB
-        repository.save(entity);
-
-        return new QuantityDTO(result.getValue(), q1.unit);
+    public QuantityMeasurementDTO divide(QuantityDTO q1, QuantityDTO q2) {
+        QuantityMeasurementEntity e = new QuantityMeasurementEntity();
+        try {
+            double result = toQuantity(q1).divide(toQuantity(q2));
+            e.setThisValue(q1.getValue());
+            e.setThisUnit(q1.getUnit());
+            e.setThisMeasurementType(q1.getMeasurementType());
+            e.setThatValue(q2.getValue());
+            e.setThatUnit(q2.getUnit());
+            e.setThatMeasurementType(q2.getMeasurementType());
+            e.setOperation("DIVIDE");
+            e.setResultValue(result);
+            e.setError(false);
+        } catch (Exception ex) {
+            e.setError(true);
+            e.setErrorMessage(ex.getMessage());
+        }
+        return saveEntity(e);
     }
 
     @Override
-    public QuantityDTO subtract(QuantityDTO q1, QuantityDTO q2) {
-
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
-
-        Quantity<IMeasurable> result = quantity1.subtract(quantity2);
-
-        //  SAVE
-        saveToDatabase(q1.value, q1.unit.getUnitName(), "LENGTH", "SUBTRACT", result.getValue());
-
-        return new QuantityDTO(result.getValue(), q1.unit);
+    public QuantityMeasurementDTO compare(QuantityDTO q1, QuantityDTO q2) {
+        QuantityMeasurementEntity e = new QuantityMeasurementEntity();
+        try {
+            boolean result = toQuantity(q1).equals(toQuantity(q2));
+            e.setThisValue(q1.getValue());
+            e.setThisUnit(q1.getUnit());
+            e.setThisMeasurementType(q1.getMeasurementType());
+            e.setThatValue(q2.getValue());
+            e.setThatUnit(q2.getUnit());
+            e.setThatMeasurementType(q2.getMeasurementType());
+            e.setOperation("COMPARE");
+            e.setResultString(String.valueOf(result));
+            e.setError(false);
+        } catch (Exception ex) {
+            e.setError(true);
+            e.setErrorMessage(ex.getMessage());
+        }
+        return saveEntity(e);
     }
 
     @Override
-    public double divide(QuantityDTO q1, QuantityDTO q2) {
+    public QuantityMeasurementDTO convert(QuantityDTO q1, QuantityDTO q2) {
+        QuantityMeasurementEntity e = new QuantityMeasurementEntity();
+        try {
+            double result = toQuantity(q1)
+                    .convertTo(getCoreUnit(q2.getUnit()))
+                    .getValue();
+            e.setThisValue(q1.getValue());
+            e.setThisUnit(q1.getUnit());
+            e.setThisMeasurementType(q1.getMeasurementType());
+            e.setThatValue(q2.getValue());
+            e.setThatUnit(q2.getUnit());
+            e.setThatMeasurementType(q2.getMeasurementType());
+            e.setOperation("CONVERT");
+            e.setResultValue(result);
+            e.setResultUnit(q2.getUnit());
+            e.setResultMeasurementType(q2.getMeasurementType());
+            e.setError(false);
+        } catch (Exception ex) {
+            e.setError(true);
+            e.setErrorMessage(ex.getMessage());
+        }
+        return saveEntity(e);
+    }
 
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
+    @Override
+    public List<QuantityMeasurementDTO> getHistoryByOperation(String operation) {
+        return repository.findByOperation(operation)
+                .stream()
+                .map(QuantityMeasurementDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
 
-        double result = quantity1.divide(quantity2);
-
-        //  SAVE
-        saveToDatabase(q1.value, q1.unit.getUnitName(), "DIVIDE", "DIVIDE", result);
-
-        return result;
+    @Override
+    public long countByOperation(String operation) {
+        return repository.countByOperationAndIsErrorFalse(operation);
     }
 }
