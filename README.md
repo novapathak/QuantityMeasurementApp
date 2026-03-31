@@ -271,3 +271,109 @@ Refactors arithmetic operations to remove duplication and centralize logic.
 ## Summary
 
 This project evolves from basic equality checks to a **fully scalable measurement system**. It demonstrates strong use of **OOP concepts**, **clean architecture**, **reusability**, and **type safety** across multiple measurement categories.
+
+---
+
+## ✅ UC14: TEMPERATURE MEASUREMENT (NON-LINEAR UNITS)
+
+### 📌 DESCRIPTION
+Handles temperature conversion and comparison where units are **non-linear** and do not support arithmetic operations.
+
+### ⭐ IMPORTANT POINTS
+- Conversion is **formula-based (NOT multiplicative)**
+- Base unit: **Celsius**
+- Supports **Celsius and Fahrenheit**
+- Enables **cross-unit comparison**
+- ❌ Arithmetic operations are NOT allowed
+- Throws **UnsupportedOperationException**
+- Maintains **backward compatibility**
+
+### 🌡️ CONVERSION FORMULA
+C = (F − 32) × 5/9
+
+### 🔁 BEHAVIOR EXAMPLES
+
+#### ✔️ Equality
+0°C == 32°F → true
+100°C == 212°F → true
+-40°C == -40°F → true
+
+#### 🔄 Conversion
+0°C → 32°F
+50°C → 122°F
+
+### ❌ RESTRICTED OPERATIONS
+- Addition ❌  
+- Subtraction ❌  
+- Multiplication ❌  
+- Division ❌  
+
+---
+
+## ------------------------------------------------------------
+
+---
+
+## ✅ UC15: N-TIER ARCHITECTURE REFACTOR
+
+### 📌 DESCRIPTION
+Refactors the application into a **professional layered (N-Tier) architecture**.
+
+### 📦 PACKAGE STRUCTURE
+com.apps.quantitymeasurement
+├── controller/
+├── service/
+├── repository/
+├── entity/
+├── exception/
+├── unit/
+└── core/
+
+### ⭐ IMPORTANT POINTS
+- Clear **separation of concerns**
+- Introduced:
+  - `QuantityMeasurementEntity` → Database layer
+  - `QuantityDTO` → Data transfer layer
+- Improved **code maintainability**
+- Structured for **scalability and enterprise development**
+
+---
+
+## ------------------------------------------------------------
+
+---
+
+## ✅ UC16: JDBC DATABASE INTEGRATION
+
+### 📌 DESCRIPTION
+Introduces **database persistence using JDBC with H2 embedded database**.
+
+### ⭐ IMPORTANT POINTS
+- Uses **H2 Embedded Database**
+- Implements **Connection Pooling**
+- Supports **Transaction Management (commit/rollback)**
+- Prevents SQL Injection using **PreparedStatement**
+- Provides full **CRUD operations**
+- Includes **unit and integration testing**
+
+### 🛠️ REPOSITORY OPERATIONS
+
+| METHOD                  | DESCRIPTION                      |
+|------------------------|----------------------------------|
+| save()                 | Save data to database           |
+| getAllMeasurements()   | Retrieve all records            |
+| findByOperation()      | Filter by operation             |
+| findByMeasurementType()| Filter by measurement type      |
+| getCount()             | Get total record count          |
+| deleteAll()            | Delete all records              |
+| getPoolStatistics()    | View connection pool stats      |
+| releaseResources()     | Close all connections           |
+
+### 🗄️ DATABASE SCHEMA
+- `quantity_measurement_entity` → Main table  
+- `quantity_measurement_history` → Audit trail  
+
+### ⚙️ CONFIGURATION
+```properties
+app.repository.type=database
+-----------------------------------------------------------
