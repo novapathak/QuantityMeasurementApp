@@ -41,16 +41,18 @@ public enum VolumeUnit implements IMeasurable {
         return name();
     }
     
+    @Override
     public String getMeasurementType() {
-    	return this.getClass().getSimpleName();
+    	return "VolumeUnit";
     }
     
+    @Override
     public IMeasurable getUnitInstance(String unitName) {
-    	for(TemperatureUnit unit : TemperatureUnit.values()) {
+    	for(VolumeUnit unit : VolumeUnit.values()) {
     		if(unit.getUnitName().equalsIgnoreCase(unitName)) {
     			return unit;
     		}
     	}
-    	throw new IllegalArgumentException("Invalid length unit: "+ unitName);
+    	throw new IllegalArgumentException("Invalid volume unit: "+ unitName);
     }
 }
