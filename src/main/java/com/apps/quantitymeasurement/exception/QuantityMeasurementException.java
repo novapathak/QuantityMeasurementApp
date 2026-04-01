@@ -7,4 +7,8 @@ public class QuantityMeasurementException extends RuntimeException{
 		super(message);	
 	}
 
+	public QuantityMeasurementException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }
