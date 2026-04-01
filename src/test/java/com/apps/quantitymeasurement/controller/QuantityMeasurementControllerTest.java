@@ -1,14 +1,16 @@
 package com.apps.quantitymeasurement.controller;
 
-import com.apps.quantitymeasurement.config.SecurityConfig;
 import com.apps.quantitymeasurement.exception.GlobalExceptionHandler;
 import com.apps.quantitymeasurement.model.QuantityDTO;
 import com.apps.quantitymeasurement.model.QuantityInputDTO;
 import com.apps.quantitymeasurement.model.QuantityMeasurementDTO;
+import com.apps.quantitymeasurement.security.JwtService;
 import com.apps.quantitymeasurement.service.IQuantityMeasurementService;
+import com.apps.quantitymeasurement.service.AppUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -27,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(QuantityMeasurementController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
+@Import(GlobalExceptionHandler.class)
 class QuantityMeasurementControllerTest {
 
     @Autowired
@@ -38,6 +41,12 @@ class QuantityMeasurementControllerTest {
 
     @MockBean
     private IQuantityMeasurementService service;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private AppUserService appUserService;
 
     @Test
     void testCompareQuantities() throws Exception {
