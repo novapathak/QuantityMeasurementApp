@@ -97,6 +97,18 @@ public class Quantity<U extends IMeasurable> {
 		return performBaseArithmetic(other, ArithmeticOperation.DIVIDE);
 	}
 
+	// MULTIPLY
+	public Quantity<U> multiply(Quantity<U> other) {
+		return multiply(other, this.unit);
+	}
+
+	public Quantity<U> multiply(Quantity<U> other, U targetUnit) {
+		validateArithmeticOperands(other, targetUnit, true);
+		double left = targetUnit.convertFromBaseUnit(this.toBaseUnit());
+		double right = targetUnit.convertFromBaseUnit(other.toBaseUnit());
+		return new Quantity<>(roundToTwoDecimal(left * right), targetUnit);
+	}
+
 	private double performBaseArithmetic(Quantity<U> other, ArithmeticOperation operation) {
 
 		this.unit.validateOperationSupport(operation.name());
