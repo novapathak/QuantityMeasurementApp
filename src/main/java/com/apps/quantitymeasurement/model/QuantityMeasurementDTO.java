@@ -2,8 +2,10 @@ package com.apps.quantitymeasurement.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class QuantityMeasurementDTO {
 
@@ -27,6 +29,10 @@ public class QuantityMeasurementDTO {
     private boolean error;
 
     public static QuantityMeasurementDTO fromEntity(QuantityMeasurementEntity e) {
+        if (e == null) {
+            return null;
+        }
+
         return new QuantityMeasurementDTO(
                 e.getThisValue(),
                 e.getThisUnit(),
