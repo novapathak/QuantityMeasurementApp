@@ -4,6 +4,7 @@ import com.apps.quantitymeasurement.model.*;
 import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
 import com.apps.quantitymeasurement.service.IQuantityMeasurementService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @Validated
 @Tag(name = "Quantity Measurements", description = "REST API for quantity measurement operations")
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(
         value = "/api/v1/quantities",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
