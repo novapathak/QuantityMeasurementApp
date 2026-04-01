@@ -63,17 +63,20 @@ public enum TemperatureUnit implements IMeasurable {
 		throw new UnsupportedOperationException("Temperature does not use a constant conversion factor.");
 	}
 	
+	@Override
 	public String getMeasurementType() {
-		return this.getClass().getName();
+		return "TemperatureUnit";
 	}
 	
+	@Override
 	public IMeasurable getUnitInstance(String unitName) {
 		for(TemperatureUnit unit : TemperatureUnit.values()) {
 			if(unit.getUnitName().equalsIgnoreCase(unitName)) {
 				return unit;
 			}
 		};
-		throw new IllegalArgumentException("Invalid length unit: "+ unitName);	}
+		throw new IllegalArgumentException("Invalid temperature unit: "+ unitName);
+	}
 	
 	
 }
