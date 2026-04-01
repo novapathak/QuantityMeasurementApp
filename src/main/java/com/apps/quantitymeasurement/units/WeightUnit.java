@@ -34,17 +34,18 @@ public enum WeightUnit implements IMeasurable {
 		return this.name();
 	}
 	
-	
+	@Override
 	public String getMeasurementType() {
-		return this.getClass().getSimpleName();
+		return "WeightUnit";
 	}
 	
+	@Override
 	public IMeasurable getUnitInstance(String unitName) {
 		for(WeightUnit unit : WeightUnit.values()) {
 			if(unit.getUnitName().equalsIgnoreCase(unitName)) {
 				return unit;
 			}
 		}
-		throw new IllegalArgumentException("Invalid length unit: "+ unitName);
+		throw new IllegalArgumentException("Invalid weight unit: "+ unitName);
 	}
 }
