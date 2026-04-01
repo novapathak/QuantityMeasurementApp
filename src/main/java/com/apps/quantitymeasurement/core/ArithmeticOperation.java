@@ -5,9 +5,10 @@ import java.util.function.DoubleBinaryOperator;
 public enum ArithmeticOperation {
 	ADD((a, b) -> a + b), 
 	SUBTRACT((a, b) -> a - b), 
+	MULTIPLY((a, b) -> a * b),
 	DIVIDE((a, b) -> {
 		if (Math.abs(b) < Quantity.EPSILON) {
-			throw new ArithmeticException("Cannot divide by zero quantity");
+			throw new ArithmeticException("Divide by zero");
 		}
 		return a / b;
 	});
