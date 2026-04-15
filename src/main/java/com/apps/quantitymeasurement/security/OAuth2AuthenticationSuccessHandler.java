@@ -12,6 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -51,7 +53,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         String token = jwtService.generateToken(user.getUsername(), roles, claims);
 
-        String redirectUrl = UriComponentsBuilder.fromUriString(googleOAuth2Properties.getAuthorizedRedirectUri())
+        String redirectUrl = UriComponentsBuilder.fromUriString(resolveRedirectUri(request))
                 .queryParam("token", token)
                 .queryParam("email", user.getEmail())
                 .queryParam("username", user.getUsername())
@@ -60,5 +62,16 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .toUriString();
 
         response.sendRedirect(redirectUrl);
+    }
+
+    private String resolveRedirectUri(HttpServletRequest request) {
+        if (StringUtils.hasText(googleOAuth2Properties.getAuthorizedRedirectUri())) {
+            return googleOAuth2Properties.getAuthorizedRedirectUri();
+        }
+        return ServletUriComponentsBuilder.fromRequestUri(request)
+                .replacePath("/oauth2/redirect/index.html")
+                .replaceQuery(null)
+                .build()
+                .toUriString();
     }
 }

@@ -170,6 +170,24 @@ class QuantityMeasurementApplicationTests {
     }
 
     @Test
+    void testLandingPageLoads() {
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/", String.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody() != null && response.getBody().contains("Frontend and backend are now served from the same Spring Boot app."));
+    }
+
+    @Test
+    void testMetadataEndpointLoads() {
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/api/v1/metadata/measurements", String.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody() != null && response.getBody().contains("\"measurementTypes\""));
+        assertTrue(response.getBody().contains("\"LengthUnit\""));
+        assertTrue(response.getBody().contains("\"googleOAuthEnabled\""));
+    }
+
+    @Test
     void testOpenApiDocumentationLoads() {
         ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/api-docs", String.class);
 

@@ -6,7 +6,9 @@ import com.apps.quantitymeasurement.units.TemperatureUnit;
 import com.apps.quantitymeasurement.units.VolumeUnit;
 import com.apps.quantitymeasurement.units.WeightUnit;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -64,6 +66,33 @@ public final class MeasurementUnitRegistry {
         return type.get().equalsIgnoreCase(unit.get().getMeasurementType());
     }
 
+    public static Map<String, List<String>> supportedUnitsByMeasurementType() {
+        Map<String, List<String>> supportedUnits = new LinkedHashMap<>();
+        supportedUnits.put("LengthUnit", unitNames(LengthUnit.values()));
+        supportedUnits.put("WeightUnit", unitNames(WeightUnit.values()));
+        supportedUnits.put("VolumeUnit", unitNames(VolumeUnit.values()));
+        supportedUnits.put("TemperatureUnit", unitNames(TemperatureUnit.values()));
+        return supportedUnits;
+    }
+
+    public static List<String> supportedUnitsForMeasurementType(String measurementType) {
+        return canonicalMeasurementType(measurementType)
+                .map(type -> supportedUnitsByMeasurementType().getOrDefault(type, List.of()))
+                .orElse(List.of());
+    }
+
+    public static boolean supportsArithmeticForMeasurementType(String measurementType) {
+        return canonicalMeasurementType(measurementType)
+                .map(type -> switch (type) {
+                    case "LengthUnit" -> LengthUnit.INCH.supportsArithmetic();
+                    case "WeightUnit" -> WeightUnit.GRAM.supportsArithmetic();
+                    case "VolumeUnit" -> VolumeUnit.LITRE.supportsArithmetic();
+                    case "TemperatureUnit" -> TemperatureUnit.CELSIUS.supportsArithmetic();
+                    default -> false;
+                })
+                .orElse(false);
+    }
+
     private static void registerMeasurementType(String canonicalType, String... aliases) {
         MEASUREMENT_TYPE_ALIASES.put(normalize(canonicalType), canonicalType);
         for (String alias : aliases) {
@@ -101,6 +130,12 @@ public final class MeasurementUnitRegistry {
         for (String alias : aliases) {
             UNIT_ALIASES.put(normalize(alias), measurable);
         }
+    }
+
+    private static List<String> unitNames(IMeasurable[] measurables) {
+        return Arrays.stream(measurables)
+                .map(IMeasurable::getUnitName)
+                .toList();
     }
 
     private static String normalize(String value) {

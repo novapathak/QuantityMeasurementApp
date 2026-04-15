@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -24,11 +26,22 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
             HttpServletResponse response,
             AuthenticationException exception
     ) throws IOException, ServletException {
-        String redirectUrl = UriComponentsBuilder.fromUriString(googleOAuth2Properties.getAuthorizedRedirectUri())
+        String redirectUrl = UriComponentsBuilder.fromUriString(resolveRedirectUri(request))
                 .queryParam("error", exception.getMessage())
                 .build()
                 .toUriString();
 
         response.sendRedirect(redirectUrl);
+    }
+
+    private String resolveRedirectUri(HttpServletRequest request) {
+        if (StringUtils.hasText(googleOAuth2Properties.getAuthorizedRedirectUri())) {
+            return googleOAuth2Properties.getAuthorizedRedirectUri();
+        }
+        return ServletUriComponentsBuilder.fromRequestUri(request)
+                .replacePath("/oauth2/redirect/index.html")
+                .replaceQuery(null)
+                .build()
+                .toUriString();
     }
 }
