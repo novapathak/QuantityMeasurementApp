@@ -14,6 +14,6 @@ public class GoogleOAuth2Properties {
     private String clientId;
     private String clientSecret;
     private String redirectUri = "{baseUrl}/login/oauth2/code/{registrationId}";
-    private String authorizedRedirectUri = "http://localhost:3000/oauth2/redirect";
+    private String authorizedRedirectUri;
     private List<String> scopes = new ArrayList<>(List.of("openid", "email", "profile"));
 }

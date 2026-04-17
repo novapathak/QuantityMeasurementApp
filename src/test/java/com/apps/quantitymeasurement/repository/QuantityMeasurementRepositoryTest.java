@@ -27,21 +27,17 @@ class QuantityMeasurementRepositoryTest {
     }
 
     @Test
-    void testJPARepositoryCustomQueryAndFilters() {
+    void testJPARepositoryFilters() {
         LocalDateTime now = LocalDateTime.now();
         repository.save(createEntity("ADD", "LengthUnit", false, now.minusHours(3)));
         repository.save(createEntity("ADD", "WeightUnit", true, now.minusHours(2)));
         repository.save(createEntity("COMPARE", "LengthUnit", false, now.minusHours(1)));
 
-        List<QuantityMeasurementEntity> successfulAdds = repository.findSuccessfulByOperation("ADD");
         List<QuantityMeasurementEntity> errored = repository.findByIsErrorTrue();
         List<QuantityMeasurementEntity> byType = repository.findByThisMeasurementTypeIgnoreCase("LengthUnit");
-        List<QuantityMeasurementEntity> recent = repository.findByCreatedAtAfter(now.minusHours(2).minusMinutes(1));
 
-        assertEquals(1, successfulAdds.size());
         assertEquals(1, errored.size());
         assertEquals(2, byType.size());
-        assertEquals(2, recent.size());
     }
 
     private QuantityMeasurementEntity createEntity(

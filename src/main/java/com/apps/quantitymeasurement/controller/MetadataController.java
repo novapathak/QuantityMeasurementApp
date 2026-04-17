@@ -1,10 +1,16 @@
 package com.apps.quantitymeasurement.controller;
 
 import com.apps.quantitymeasurement.config.GoogleOAuth2Properties;
+import com.apps.quantitymeasurement.exception.ApiErrorResponse;
 import com.apps.quantitymeasurement.model.MeasurementCatalogResponse;
 import com.apps.quantitymeasurement.model.MeasurementTypeMetadata;
 import com.apps.quantitymeasurement.model.OperationMetadata;
 import com.apps.quantitymeasurement.util.MeasurementUnitRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +23,16 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/metadata")
-@Tag(name = "Metadata", description = "Frontend metadata endpoints")
+@Tag(name = "Metadata", description = "API metadata and supported units")
 public class MetadataController {
 
     private final GoogleOAuth2Properties googleOAuth2Properties;
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Get measurement units and operation metadata")
+    @Operation(summary = "Get supported units and operation capabilities")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Metadata fetched", content = @Content(schema = @Schema(implementation = MeasurementCatalogResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @GetMapping("/measurements")
     public MeasurementCatalogResponse measurements() {
         Map<String, List<String>> unitsByMeasurementType = MeasurementUnitRegistry.supportedUnitsByMeasurementType();

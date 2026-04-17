@@ -169,13 +169,6 @@ class QuantityMeasurementApplicationTests {
         assertTrue(response.getBody() != null && response.getBody().contains("Swagger UI"));
     }
 
-    @Test
-    void testLandingPageLoads() {
-        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/", String.class);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() != null && response.getBody().contains("Frontend and backend are now served from the same Spring Boot app."));
-    }
 
     @Test
     void testMetadataEndpointLoads() {

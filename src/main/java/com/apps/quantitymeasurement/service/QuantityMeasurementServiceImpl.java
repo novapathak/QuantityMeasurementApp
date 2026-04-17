@@ -6,21 +6,23 @@ import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
 import com.apps.quantitymeasurement.model.*;
 import com.apps.quantitymeasurement.repository.QuantityMeasurementRepository;
 import com.apps.quantitymeasurement.util.MeasurementUnitRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
 
     private final QuantityMeasurementRepository repository;
 
-    @Autowired
     public QuantityMeasurementServiceImpl(QuantityMeasurementRepository repository) {
         this.repository = repository;
+    }
+
+    @FunctionalInterface
+    private interface QuantityBinaryOperation {
+        double apply(Quantity<IMeasurable> left, Quantity<IMeasurable> right, IMeasurable targetUnit);
     }
 
     private Quantity<IMeasurable> toQuantity(QuantityDTO dto) {
@@ -98,49 +100,60 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         throw new RuntimeException(ex);
     }
 
-    @Override
-    public QuantityMeasurementDTO add(QuantityDTO q1, QuantityDTO q2, String targetUnit) {
-        QuantityMeasurementEntity e = buildEntity(q1, q2, OperationType.ADD);
+    private QuantityMeasurementDTO executeQuantityOperation(
+            QuantityDTO q1,
+            QuantityDTO q2,
+            String targetUnit,
+            OperationType operationType,
+            QuantityBinaryOperation operation
+    ) {
+        QuantityMeasurementEntity entity = buildEntity(q1, q2, operationType);
         try {
             String resolvedTargetUnit = resolveTargetUnit(targetUnit, null, q1);
-            double result = toQuantity(q1).add(toQuantity(q2), getCoreUnit(resolvedTargetUnit)).getValue();
-            e.setResultValue(result);
-            e.setResultUnit(resolvedTargetUnit);
-            e.setResultMeasurementType(MeasurementUnitRegistry.measurementTypeForUnit(resolvedTargetUnit).orElse(resolveMeasurementType(q1)));
+            IMeasurable targetCoreUnit = getCoreUnit(resolvedTargetUnit);
+            double result = operation.apply(toQuantity(q1), toQuantity(q2), targetCoreUnit);
+            entity.setResultValue(result);
+            entity.setResultUnit(resolvedTargetUnit);
+            entity.setResultMeasurementType(
+                    MeasurementUnitRegistry.measurementTypeForUnit(resolvedTargetUnit).orElse(resolveMeasurementType(q1))
+            );
         } catch (Exception ex) {
-            saveErrorAndThrow(e, ex, OperationType.ADD, true);
+            saveErrorAndThrow(entity, ex, operationType, true);
         }
-        return saveEntity(e);
+        return saveEntity(entity);
+    }
+
+    @Override
+    public QuantityMeasurementDTO add(QuantityDTO q1, QuantityDTO q2, String targetUnit) {
+        return executeQuantityOperation(
+                q1,
+                q2,
+                targetUnit,
+                OperationType.ADD,
+                (left, right, resolvedTarget) -> left.add(right, resolvedTarget).getValue()
+        );
     }
 
     @Override
     public QuantityMeasurementDTO subtract(QuantityDTO q1, QuantityDTO q2, String targetUnit) {
-        QuantityMeasurementEntity e = buildEntity(q1, q2, OperationType.SUBTRACT);
-        try {
-            String resolvedTargetUnit = resolveTargetUnit(targetUnit, null, q1);
-            double result = toQuantity(q1).subtract(toQuantity(q2), getCoreUnit(resolvedTargetUnit)).getValue();
-            e.setResultValue(result);
-            e.setResultUnit(resolvedTargetUnit);
-            e.setResultMeasurementType(MeasurementUnitRegistry.measurementTypeForUnit(resolvedTargetUnit).orElse(resolveMeasurementType(q1)));
-        } catch (Exception ex) {
-            saveErrorAndThrow(e, ex, OperationType.SUBTRACT, true);
-        }
-        return saveEntity(e);
+        return executeQuantityOperation(
+                q1,
+                q2,
+                targetUnit,
+                OperationType.SUBTRACT,
+                (left, right, resolvedTarget) -> left.subtract(right, resolvedTarget).getValue()
+        );
     }
 
     @Override
     public QuantityMeasurementDTO multiply(QuantityDTO q1, QuantityDTO q2, String targetUnit) {
-        QuantityMeasurementEntity e = buildEntity(q1, q2, OperationType.MULTIPLY);
-        try {
-            String resolvedTargetUnit = resolveTargetUnit(targetUnit, null, q1);
-            double result = toQuantity(q1).multiply(toQuantity(q2), getCoreUnit(resolvedTargetUnit)).getValue();
-            e.setResultValue(result);
-            e.setResultUnit(resolvedTargetUnit);
-            e.setResultMeasurementType(MeasurementUnitRegistry.measurementTypeForUnit(resolvedTargetUnit).orElse(resolveMeasurementType(q1)));
-        } catch (Exception ex) {
-            saveErrorAndThrow(e, ex, OperationType.MULTIPLY, true);
-        }
-        return saveEntity(e);
+        return executeQuantityOperation(
+                q1,
+                q2,
+                targetUnit,
+                OperationType.MULTIPLY,
+                (left, right, resolvedTarget) -> left.multiply(right, resolvedTarget).getValue()
+        );
     }
 
     @Override
@@ -189,7 +202,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return repository.findByOperationIgnoreCase(OperationType.fromValue(operation).name())
                 .stream()
                 .map(QuantityMeasurementDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -200,7 +213,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return repository.findByThisMeasurementTypeIgnoreCase(normalizedMeasurementType)
                 .stream()
                 .map(QuantityMeasurementDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -208,7 +221,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return repository.findByIsErrorTrue()
                 .stream()
                 .map(QuantityMeasurementDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

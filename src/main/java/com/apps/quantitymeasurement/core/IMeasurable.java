@@ -9,14 +9,13 @@ public interface IMeasurable {
 	double convertFromBaseUnit(double baseValue);
 
 	String getUnitName();
-	SupportsArithmetic supportsArithmetic = () -> true;
-	
+
 	public String getMeasurementType();
-	public IMeasurable getUnitInstance(String unitName);
 
 	default boolean supportsArithmetic() {
-		return supportsArithmetic.isSupported();
+		return true;
 	}
-		default void validateOperationSupport(String operation) {
+
+	default void validateOperationSupport(String operation) {
 	}
 }

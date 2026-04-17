@@ -2,6 +2,7 @@ package com.apps.quantitymeasurement.model;
 
 import com.apps.quantitymeasurement.util.MeasurementUnitRegistry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,12 +16,15 @@ import lombok.AllArgsConstructor;
 public class QuantityDTO {
 
     @NotNull(message = "Value is required")
+    @Schema(example = "12.0", description = "Numeric value for the quantity")
     private Double value;
 
     @NotBlank(message = "Unit is required")
+    @Schema(example = "INCH", description = "Unit name (aliases like INCHES are also accepted)")
     private String unit;
 
     @NotBlank(message = "Measurement type is required")
+    @Schema(example = "LengthUnit", description = "Measurement family for this quantity")
     private String measurementType;
 
     @JsonIgnore

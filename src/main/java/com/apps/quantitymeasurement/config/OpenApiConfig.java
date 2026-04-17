@@ -17,7 +17,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Quantity Measurement App API")
-                        .description("REST API for quantity measurements with JWT and OAuth2 authentication")
+                        .description("Backend-only REST API for quantity operations, authentication, and metadata")
                         .version("v1"))
                 .components(new Components()
                         .addSecuritySchemes(BEARER_AUTH_SCHEME, new SecurityScheme()

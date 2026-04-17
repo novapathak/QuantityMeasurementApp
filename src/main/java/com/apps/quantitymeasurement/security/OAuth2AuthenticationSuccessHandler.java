@@ -69,7 +69,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             return googleOAuth2Properties.getAuthorizedRedirectUri();
         }
         return ServletUriComponentsBuilder.fromRequestUri(request)
-                .replacePath("/oauth2/redirect/index.html")
+                .replacePath("/swagger-ui.html")
                 .replaceQuery(null)
                 .build()
                 .toUriString();

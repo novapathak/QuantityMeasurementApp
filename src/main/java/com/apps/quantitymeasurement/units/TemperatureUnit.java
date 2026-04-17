@@ -3,7 +3,6 @@ package com.apps.quantitymeasurement.units;
 import java.util.function.Function;
 
 import com.apps.quantitymeasurement.core.IMeasurable;
-import com.apps.quantitymeasurement.core.SupportsArithmetic;
 
 public enum TemperatureUnit implements IMeasurable {
 
@@ -17,9 +16,6 @@ public enum TemperatureUnit implements IMeasurable {
 	private final Function<Double, Double> toBaseFunction;
 	private final Function<Double, Double> fromBaseFunction;
 	private final String unitName;
-
-	// Temperature does NOT support arithmetic
-	private final SupportsArithmetic supportsArithmetic = () -> false;
 
 	TemperatureUnit(Function<Double, Double> toBaseFunction, Function<Double, Double> fromBaseFunction,
 			String unitName) {
@@ -50,7 +46,7 @@ public enum TemperatureUnit implements IMeasurable {
 	// UC14: Temperature does NOT support arithmetic
 	@Override
 	public boolean supportsArithmetic() {
-		return supportsArithmetic.isSupported();
+		return false;
 	}
 
 	@Override
@@ -67,16 +63,5 @@ public enum TemperatureUnit implements IMeasurable {
 	public String getMeasurementType() {
 		return "TemperatureUnit";
 	}
-	
-	@Override
-	public IMeasurable getUnitInstance(String unitName) {
-		for(TemperatureUnit unit : TemperatureUnit.values()) {
-			if(unit.getUnitName().equalsIgnoreCase(unitName)) {
-				return unit;
-			}
-		};
-		throw new IllegalArgumentException("Invalid temperature unit: "+ unitName);
-	}
-	
-	
+
 }
